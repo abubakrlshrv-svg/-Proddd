@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProDDD Translate</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0b1020;
+    color: white;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+header {
+    max-width: 900px;
+    margin: 15px auto 55px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #8b5cf6, #38bdf8);
+    display: grid;
+    place-items: center;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+header h1 {
+    font-size: 22px;
+}
+
+header p {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+main {
+    max-width: 760px;
+    margin: auto;
+}
+
+.intro {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.intro span {
+    color: #38d9c5;
+    font-size: 12px;
+    letter-spacing: 3px;
+}
+
+.intro h2 {
+    font-size: clamp(30px, 6vw, 44px);
+    margin: 15px 0;
+}
+
+.intro p {
+    color: #94a3b8;
+    line-height: 1.6;
+}
+
+.translator {
+    background: #131c30;
+    padding: 22px;
+    border: 1px solid #27334d;
+    border-radius: 22px;
+    box-shadow: 0 20px 60px #0004;
+}
+
+.languages {
+    display: grid;
+    grid-template-columns: 1fr 48px 1fr;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+select {
+    width: 100%;
+    padding: 13px 8px;
+    background: #202c44;
+    border: 1px solid #35425c;
+    color: white;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+button {
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.swap {
+    width: 45px;
+    height: 45px;
+    border: 1px solid #35425c;
+    background: #202c44;
+    color: #38d9c5;
+    border-radius: 12px;
+    font-size: 23px;
+}
+
+button:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
+
+.fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.field {
+    background: #0d1526;
+    border: 1px solid #293650;
+    border-radius: 15px;
+    padding: 15px;
+    min-width: 0;
+}
+
+.label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+textarea {
+    width: 100%;
+    min-height: 125px;
+    resize: vertical;
+    background: transparent;
+    color: white;
+    border: none;
+    outline: none;
+    font-size: 17px;
+    line-height: 1.6;
+    font-family: inherit;
+}
+
+textarea::placeholder {
+    color: #64748b;
+}
+
+#result {
+    min-height: 125px;
+    overflow-wrap: anywhere;
+    font-size: 19px;
+    line-height: 1.6;
+}
+
+.placeholder {
+    color: #64748b;
+    font-size: 15px !important;
+}
+
+.transcription {
+    display: none;
+    background: #19243a;
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 12px;
+}
+
+.transcription.visible {
+    display: block;
+}
+
+.transcription small {
+    display: block;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+#ipa {
+    color: #38d9c5;
+    font-size: 17px;
+    overflow-wrap: anywhere;
+}
+
+.tools {
+    display: flex;
+    justify-content: space-between;
+    gap: 7px;
+    margin-top: 10px;
+}
+
+.small-btn {
+    background: #202c44;
+    border: 1px solid #35425c;
+    border-radius: 8px;
+    padding: 9px;
+    color: #cbd5e1;
+    font-size: 12px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 17px;
+}
+
+.translate {
+    flex: 1;
+    padding: 15px;
+    background: linear-gradient(100deg, #8b5cf6, #3b82f6);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.clear {
+    padding: 0 16px;
+    background: transparent;
+    border: 1px solid #35425c;
+    border-radius: 12px;
+    color: #cbd5e1;
+}
+
+#status {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 12px;
+    margin-top: 15px;
+    line-height: 1.5;
+}
+
+footer {
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+    margin: 35px auto 15px;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 14px;
+    }
+
+    header {
+        margin: 8px auto 35px;
+    }
+
+    .translator {
+        padding: 13px;
+    }
+
+    .fields {
+        grid-template-columns: 1fr;
+    }
+
+    .field {
+        min-height: 170px;
+    }
+
+    textarea {
+        min-height: 95px;
+    }
+
+    #result {
+        min-height: 90px;
+    }
+
+    .intro h2 {
+        font-size: 31px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">P</div>
+    <div>
+        <h1>ProDDD Translate</h1>
+        <p>Твой личный переводчик</p>
+    </div>
+</header>
+
+<main>
+
+    <section class="intro">
+        <span>ENGLISH ⇄ RUSSIAN</span>
+        <h2>Переводи легко.</h2>
+        <p>
+            Перевод слов и фраз, транскрипция
+            и произношение в одном месте.
+        </p>
+    </section>
+
+    <section class="translator">
+
+        <div class="languages">
+
+            <select id="from">
+                <option value="en">🇬🇧 Английский</option>
+                <option value="ru">🇷🇺 Русский</option>
+            </select>
+
+            <button class="swap" id="swap">⇄</button>
+
+            <select id="to">
+                <option value="ru">🇷🇺 Русский</option>
+                <option value="en">🇬🇧 Английский</option>
+            </select>
+
+        </div>
+
+        <div class="fields">
+
+            <div class="field">
+
+                <div class="label">
+                    <span>ТВОЙ ТЕКСТ</span>
+                    <span id="count">0/500</span>
+                </div>
+
+                <textarea
+                    id="input"
+                    maxlength="500"
+                    placeholder="Введи слово или фразу..."
+                ></textarea>
+
+                <div class="tools">
+                    <button class="small-btn" id="listenInput">
+                        🔊 Слушать
+                    </button>
+
+                    <button class="small-btn" id="clear">
+                        Очистить ×
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="field">
+
+                <div class="label">
+                    <span>ПЕРЕВОД</span>
+
+                    <button class="small-btn" id="copy">
+                        📋 Копировать
+                    </button>
+                </div>
+
+                <div id="result" class="placeholder">
+                    Здесь появится перевод...
+                </div>
+
+                <div class="transcription" id="transcription">
+                    <small>ТРАНСКРИПЦИЯ (IPA)</small>
+                    <div id="ipa">—</div>
+                </div>
+
+                <div class="tools">
+                    <button class="small-btn" id="listenResult">
+                        🔊 Озвучить перевод
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="actions">
+            <button class="translate" id="translate">
+                Перевести →
+            </button>
+
+            <button class="clear" id="example">
+                Пример
+            </button>
+        </div>
+
+        <div id="status" role="status">
+            Готов к переводу. Для работы нужен интернет.
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    © 2026 ProDDD · Сделано для изучения языков
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const input = $("input");
+const result = $("result");
+const from = $("from");
+const to = $("to");
+
+let lastTranslation = "";
+let currentRequest = 0;
+
+
+// Сообщения пользователю
+function status(message) {
+    $("status").textContent = message;
+}
+
+
+// Счётчик символов
+input.addEventListener("input", () => {
+    $("count").textContent = input.value.length + "/500";
+});
+
+
+// Переключение языков
+$("swap").addEventListener("click", () => {
+    const oldFrom = from.value;
+
+    from.value = to.value;
+    to.value = oldFrom;
+
+    const oldInput = input.value;
+
+    input.value = lastTranslation;
+    lastTranslation = oldInput;
+
+    $("count").textContent = input.value.length + "/500";
+
+    result.textContent = "Нажми «Перевести», чтобы получить перевод.";
+    result.classList.add("placeholder");
+
+    $("transcription").classList.remove("visible");
+
+    status("Языки поменяны местами.");
+});
+
+
+// Если языки совпадают, меняем второй язык
+function fixLanguages(changed) {
+    if (from.value === to.value) {
+        if (changed === "from") {
+            to.value = from.value === "en" ? "ru" : "en";
+        } else {
+            from.value = to.value === "en" ? "ru" : "en";
+        }
+    }
+}
+
+from.addEventListener("change", () => fixLanguages("from"));
+to.addEventListener("change", () => fixLanguages("to"));
+
+
+// Перевод
+async function translateText() {
+    const text = input.value.trim();
+
+    if (!text) {
+        status("Сначала введи слово или фразу.");
+        input.focus();
+        return;
+    }
+
+    fixLanguages("from");
+
+    const request = ++currentRequest;
+    const button = $("translate");
+
+    button.disabled = true;
+    button.textContent = "Перевожу...";
+    status("Подключаю переводчик...");
+
+    $("transcription").classList.remove("visible");
+
+    try {
+        const url =
+            "https://api.mymemory.translated.net/get?q=" +
+            encodeURIComponent(text) +
+            "&langpair=" +
+            from.value + "|" + to.value;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error("Ошибка соединения");
+        }
+
+        const data = await response.json();
+
+        if (request !== currentRequest) return;
+
+        const translated =
+            data.responseData &&
+            data.responseData.translatedText;
+
+        if (
+            !translated ||
+            data.responseStatus !== 200
+        ) {
+            throw new Error("Не удалось перевести текст");
+        }
+
+        lastTranslation = translated;
+
+        result.textContent = translated;
+        result.classList.remove("placeholder");
+
+        status("Перевод готов!");
+
+        // Транскрипция нужна для английского слова.
+        if (
+            to.value === "en" &&
+            /^[a-zA-Z\s'-]+$/.test(translated) &&
+            translated.length < 100
+        ) {
+            await getTranscription(translated, request);
+        }
+
+    } catch (error) {
+        if (request !== currentRequest) return;
+
+        result.textContent =
+            "Не удалось получить перевод. Проверь интернет и попробуй ещё раз.";
+
+        result.classList.add("placeholder");
+
+        status("Ошибка: " + error.message);
+
+    } finally {
+        if (request === currentRequest) {
+            button.disabled = false;
+            button.textContent = "Перевести →";
+        }
+    }
+}
+
+$("translate").addEventListener("click", translateText);
+
+
+// Перевод по Enter, новая строка — Shift + Enter
+input.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        translateText();
+    }
+});
+
+
+// Получение транскрипции через словарь
+async function getTranscription(word, request) {
+    try {
+        const url =
+            "https://api.dictionaryapi.dev/api/v2/entries/en/" +
+            encodeURIComponent(word.split(/\s+/)[0]);
+
+        const response = await fetch(url);
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+
+        if (request !== currentRequest) return;
+
+        const entry = data[0];
+
+        if (!entry || !entry.phonetics) return;
+
+        let phonetic = "";
+
+        for (const item of entry.phonetics) {
+            if (item.text) {
+                phonetic = item.text;
+                break;
+            }
+        }
+
+        if (phonetic) {
+            $("ipa").textContent = phonetic;
+            $("transcription").classList.add("visible");
+        }
+
+    } catch (error) {
+        console.log("Транскрипция недоступна:", error);
+    }
+}
+
+
+// Озвучивание текста
+function speak(text, lang) {
+    if (!text.trim()) {
+        status("Нет текста для озвучивания.");
+        return;
+    }
+
+    if (!("speechSynthesis" in window)) {
+        status("Озвучивание не поддерживается этим браузером.");
+        return;
+    }
+
+    speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    utterance.lang = lang === "en" ? "en-US" : "ru-RU";
+    utterance.rate = 0.85;
+
+    speechSynthesis.speak(utterance);
+}
+
+$("listenInput").addEventListener("click", () => {
+    speak(input.value, from.value);
+});
+
+$("listenResult").addEventListener("click", () => {
+    if (lastTranslation) {
+        speak(lastTranslation, to.value);
+    } else {
+        status("Сначала переведи текст.");
+    }
+});
+
+
+// Копирование результата
+$("copy").addEventListener("click", async () => {
+    const text = result.textContent;
+
+    if (!lastTranslation) {
+        status("Сначала переведи текст.");
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(text);
+        status("Перевод скопирован!");
+    } catch (error) {
+        status("Не удалось скопировать. Выдели текст вручную.");
+    }
+});
+
+
+// Очистка
+$("clear").addEventListener("click", () => {
+    currentRequest++;
+
+    input.value = "";
+    lastTranslation = "";
+
+    result.textContent = "Здесь появится перевод...";
+    result.classList.add("placeholder");
+
+    $("transcription").classList.remove("visible");
+    $("count").textContent = "0/500";
+
+    $("translate").disabled = false;
+    $("translate").textContent = "Перевести →";
+
+    status("Поле очищено.");
+    input.focus();
+});
+
+
+// Пример
+$("example").addEventListener("click", () => {
+    input.value = from.value === "en"
+        ? "Beautiful"
+        : "Красивый";
+
+    $("count").textContent = input.value.length + "/500";
+
+    translateText();
+});
+</script>
+
+</body>
+</html>
